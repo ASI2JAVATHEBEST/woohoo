@@ -17,12 +17,12 @@ io.on('connection', (socket) => {
     id: 1,
     name: 'Pikachu',
     image: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/025.png',
-    energy: 40,
-    currentEnergy: 100,
+    energy: 3,
+    currentEnergy: 3,
     hp: 100,
     currentHp: 100,
-    defence: 20,
-    attack: 10,
+    defence: 15,
+    attack: 20,
     price: 100,
     description: 'test',
   },
@@ -30,12 +30,12 @@ io.on('connection', (socket) => {
       id: 2,
       name: 'Dracaufeu',
       image: 'https://www.pokepedia.fr/images/thumb/1/17/Dracaufeu-RFVF.png/1200px-Dracaufeu-RFVF.png',
-      energy: 40,
-      currentEnergy: 100,
+      energy: 3,
+      currentEnergy: 3,
       hp: 200,
-      currentHp: 100,
-      defence: 20,
-      attack: 10,
+      currentHp: 200,
+      defence: 10,
+      attack: 30,
       price: 50,
       description: 'test',
     }
@@ -60,8 +60,32 @@ io.on('connection', (socket) => {
 
   socket.on('endTurn', (msg) => {
     room = currentRoom(rooms, msg)
+    room[room.current].cards.forEach((card) => card.currentEnergy = card.energy)
     room.current = room.current === 'user1' ? 'user2' : 'user1'
-    io.to('room' + newId).emit('setRoom', room)
+    io.to('room' + room.id).emit('setRoom', room)
+  });
+
+  socket.on('attack', (msg) => {
+    room = currentRoom(rooms, msg)
+    let from = room[room.current].cards.find((card) => card.id === msg.from)
+    let to = room[room.current === 'user1' ? 'user2' : 'user1'].cards.find((card) => card.id === msg.to)
+
+    to.currentHp -= from.attack + to.defence
+    from.currentEnergy -= 1
+
+    if(to.currentHp <= 0) {
+      room[room.current === 'user1' ? 'user2' : 'user1'].cards.splice(room[room.current === 'user1' ? 'user2' : 'user1'].cards.findIndex((card) => card.id === to.id), 1)
+    }
+
+    io.to('room' + room.id).emit('setRoom', room)
+
+    const array = ['user1', 'user2']
+
+    array.forEach((user) => {
+      if (room[user].cards.length === 0) {
+        io.to('room' + room.id).emit('end', user === 'user1' ? 'user2' : 'user1')
+      }
+    })
   });
 
   socket.on('chatMessage', (msg) => {
