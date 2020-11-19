@@ -68,7 +68,7 @@ io.on('connection', (socket) => {
   socket.on('setCards', (msg) => {
     room = currentRoom(rooms, msg)
     console.log(msg)
-    room[msg.me].cards = msg.cards
+    room[room.user1.id === msg.id ? 'user1' : 'user2'].cards = msg.cards
     io.to('room' + room.id).emit('setRoom', room)
   });
 
