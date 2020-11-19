@@ -8,7 +8,7 @@ const stompit = require("stompit")
 
 const stompitConnectOptions = {
   'host': 'localhost',
-  'port': 61613
+  'port': 61616
 }
 const stompitHeaders = {'destination':'nodeToSpringBoot'}
 
