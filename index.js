@@ -10,7 +10,7 @@ const stompitConnectOptions = {
   'host': 'localhost',
   'port': 61613
 }
-const stompitHeaders = {'destination':'/nodeToSpringBoot'}
+const stompitHeaders = {'destination':'nodeToSpringBoot'}
 
 function currentRoom(rooms, msg) {
   return rooms.find((room) => room.user1.id === msg.id || room.user2.id === msg.id)
@@ -96,7 +96,7 @@ io.on('connection', (socket) => {
       if (room[user].cards.length === 0) {
         io.to('room' + room.id).emit('end', user === 'user1' ? 'user2' : 'user1')
         try{
-          stompSend(JSON.stringify({winner: room[user].userId, chat: room.chat}))
+          stompSend(JSON.stringify({winner: room[user === 'user1' ? 'user2' : 'user1'].userId,loser: room[user].userId,chat: room.chat}))
         }catch(e){
           console.error(e);
         }
