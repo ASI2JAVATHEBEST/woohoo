@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
   let cartLists = [{
     id: 1,
     name: 'Pikachu',
-    img_url: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/025.png',
+    imgUrl: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/025.png',
     energy: 3,
     currentEnergy: 3,
     hp: 100,
