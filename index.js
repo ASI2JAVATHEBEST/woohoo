@@ -1,8 +1,16 @@
+const { log } = require('console');
 const express = require('express')
 const app = express()
 const http = require('http').createServer(app);
 const io = require('socket.io')(http, { origins: '*:*'});
 const port = 3001
+const stompit = require("stompit")
+
+const stompitConnectOptions = {
+  'host': 'localhost',
+  'port': 61613
+}
+const stompitHeaders = {'destination':'/nodeToSpringBoot'}
 
 function currentRoom(rooms, msg) {
   return rooms.find((room) => room.user1.id === msg.id || room.user2.id === msg.id)
@@ -36,7 +44,7 @@ io.on('connection', (socket) => {
     rooms[rooms.length - 1].current = 'user1'
   } else {
     newId = rooms.length + 1
-    rooms.push({id: newId, current: '', user1: { id: socket.id, cards: cartLists }, user2: {}})
+    rooms.push({id: newId, current: '', user1: { id: socket.id, cards: cartLists }, user2: {}, chat: []})
   }
   socket.join('room' + newId);
 
@@ -87,14 +95,41 @@ io.on('connection', (socket) => {
     array.forEach((user) => {
       if (room[user].cards.length === 0) {
         io.to('room' + room.id).emit('end', user === 'user1' ? 'user2' : 'user1')
+        try{
+          stompSend(JSON.stringify({winner: room[user].userId, chat: room.chat}))
+        }catch(e){
+          console.error(e);
+        }
       }
     })
   });
 
   socket.on('chatMessage', (msg) => {
+    console.log(msg);
     room = currentRoom(rooms, msg)
+    room.chat.push({username: msg.username, message: msg.message})
     io.to('room' + room.id).emit('chatMessage', msg);
   });
 });
+
+function stompSend (stringMsg) {
+
+  return new Promise((resolve, reject) => {
+    stompit.connect(
+      stompitConnectOptions, (error, client) => {
+        if (error) {
+          reject(e)
+        }
+        console.log(stringMsg)
+        const frame = client.send(stompitHeaders)
+        frame.write(stringMsg)
+        frame.end()
+        client.disconnect()
+        resolve(true)
+      });
+  })
+  
+}
+
 
 http.listen(port)
