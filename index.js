@@ -3,6 +3,13 @@ const app = express()
 const http = require('http').createServer(app);
 const io = require('socket.io')(http, { origins: '*:*'});
 const port = 3001
+const stompit = require
+
+const stompitConnectOptions = {
+  'host': 'localhost',
+  'port': 61613
+}
+const stompitHeaders = {'destination':'/nodeToSpringBoot'}
 
 function currentRoom(rooms, msg) {
   return rooms.find((room) => room.user1.id === msg.id || room.user2.id === msg.id)
@@ -90,6 +97,11 @@ io.on('connection', (socket) => {
     array.forEach((user) => {
       if (room[user].cards.length === 0) {
         io.to('room' + room.id).emit('end', user === 'user1' ? 'user2' : 'user1')
+        try{
+          stompSend(JSON.parse({winner: room[user].id}))
+        }catch(e){
+          console.error(e);
+        }
       }
     })
   });
@@ -99,5 +111,23 @@ io.on('connection', (socket) => {
     io.to('room' + room.id).emit('chatMessage', msg);
   });
 });
+
+function stompSend (stringMsg) {
+  return new Promise((resolve, reject) => {
+    stompit.connect(
+      stompitConnectOptions, (error, client) => {
+        if (error) {
+          reject(e)
+        }
+        const frame = client.send(stompitHeaders)
+        frame.write(stringMsg)
+        rame.end()
+        client.disconnect()
+        resolve(true)
+      });
+  })
+  
+}
+
 
 http.listen(port)
