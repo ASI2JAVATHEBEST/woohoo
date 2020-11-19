@@ -65,6 +65,12 @@ io.on('connection', (socket) => {
     io.to('room' + room.id).emit('setRoom', room)
   });
 
+  socket.on('setCards', (msg) => {
+    room = currentRoom(rooms, msg)
+    room[msg.me].cards = msg.cards
+    io.to('room' + room.id).emit('setRoom', room)
+  });
+
   socket.on('attack', (msg) => {
     room = currentRoom(rooms, msg)
     let from = room[room.current].cards.find((card) => card.id === msg.from)
