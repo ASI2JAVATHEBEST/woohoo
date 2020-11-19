@@ -67,6 +67,7 @@ io.on('connection', (socket) => {
 
   socket.on('setCards', (msg) => {
     room = currentRoom(rooms, msg)
+    console.log(msg)
     room[msg.me].cards = msg.cards
     io.to('room' + room.id).emit('setRoom', room)
   });
