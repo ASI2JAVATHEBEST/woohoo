@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
   let cartLists = [{
     id: 1,
     name: 'Pikachu',
-    image: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/025.png',
+    img_url: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/025.png',
     energy: 3,
     currentEnergy: 3,
     hp: 100,
@@ -25,20 +25,7 @@ io.on('connection', (socket) => {
     attack: 20,
     price: 100,
     description: 'test',
-  },
-    {
-      id: 2,
-      name: 'Dracaufeu',
-      image: 'https://www.pokepedia.fr/images/thumb/1/17/Dracaufeu-RFVF.png/1200px-Dracaufeu-RFVF.png',
-      energy: 3,
-      currentEnergy: 3,
-      hp: 200,
-      currentHp: 200,
-      defence: 10,
-      attack: 30,
-      price: 50,
-      description: 'test',
-    }
+  }
   ]
 
   if((typeof rooms[rooms.length - 1] !== 'undefined') &&  (typeof rooms[rooms.length - 1].user2.id === 'undefined')) {
